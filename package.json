@@ -4,7 +4,8 @@
   "description": "Computer vision project for burning man hackathon",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "serve static"
   },
   "repository": {
     "type": "git",
@@ -17,6 +18,8 @@
   },
   "homepage": "https://github.com/xm83/burning-man#readme",
   "dependencies": {
-    "@tensorflow/tfjs": "^0.12.0"
+    "@tensorflow/tfjs": "^0.12.0",
+    "clmtrackr": "^1.1.2",
+    "serve": "^9.2.0"
   }
 }
