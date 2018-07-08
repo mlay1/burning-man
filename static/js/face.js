@@ -1,34 +1,5 @@
 const api = pJSDom[0].pJS.fn.modes
 
-var videoInput = document.getElementById('video');
-var ctracker = new clm.tracker();
-
-ctracker.init();
-ctracker.start(videoInput);
-
-function gumSuccess( stream ) {
-  if ("srcObject" in videoInput) {
-    videoInput.srcObject = stream;
-  } else {
-    videoInput.src = (window.URL && window.URL.createObjectURL(stream));
-  }
-
-  videoInput.onloadedmetadata = function() {
-    videoInput.play();
-    setTimeout(positionLoop, 100)
-  }
-}
-
-function gumFail () {}
-
-if (navigator.mediaDevices) {
-  navigator.mediaDevices.getUserMedia({video : true}).then(gumSuccess).catch(gumFail);
-} else if (navigator.getUserMedia) {
-  navigator.getUserMedia({video : true}, gumSuccess, gumFail);
-} else {
-  alert("Your browser does not seem to support getUserMedia, using a fallback video instead.");
-}
-
 function scale(positions) {
 //center point of window
   let cx = window.pJSDom[0].pJS.canvas.w / 2
@@ -147,37 +118,104 @@ function happy(pJS, positions) {
     let pt = _positions[eyes[p]]
     api.pushParticles(1, {pos_x: pt[0], pos_y: pt[1]})
   }
-
 }
 
 var dreaming = null
+var emotion = ''
+var positions
 
-function positionLoop() {
-  var positions = ctracker.getCurrentPosition();
+
+function renderLoop() {
   if (positions) {
     const pJS = pJSDom[0].pJS
     //demoicFace(pJS, positions)
     //ghost(pJS, positions)
-    faceonly(pJS, positions)
+    //faceonly(pJS, positions)
     happy(pJS, positions)
     if(dreaming) {
       clearTimeout(dreaming);
       dreaming = null;
-      if(document.getElementById('status'))document.getElementById('status').innerText = 'HI!';
+      if(document.getElementById('status'))document.getElementById('status').innerText = emotion ='HI!';
       if(document.getElementById('people'))document.getElementById('people').style.display='none';
     }
   } else {
-    document.getElementById('status').innerText = 'unity with universe';
+    document.getElementById('status').innerText = emotion = 'unity with universe';
     if(!dreaming) dreaming = setTimeout(function() {
-      if(document.getElementById('status')) document.getElementById('status').innerText = 'dreaming of you!';
+      if(document.getElementById('status')) document.getElementById('status').innerText = emotion = 'dreaming of you!';
       if(document.getElementById('people')) document.getElementById('people').style.display='block';
     }, 5000)
   }
 }
 
+function positionLoop() {
+  positions = ctracker.getCurrentPosition();
+  if (positions) {
+    const pJS = pJSDom[0].pJS
+    //demoicFace(pJS, positions)
+    //ghost(pJS, positions)
+    //faceonly(pJS, positions)
+    happy(pJS, positions)
+
+    socket.emit('face', {
+      cameraId,
+      emotion,
+      data: positions
+    })
+  } else {
+    socket.emit('face', {
+      cameraId,
+      emotion,
+      data: null
+    })
+  }
+}
+
+let cameraId = '';
+
 var socket = io();
 socket.on('connect', function() {
   console.log('Connected!');
+  if(document.getElementById('people')) {
+    socket.on('face', function (msg) {
+      console.log('message', msg)
+      positions = msg.data
+    })
+  } else {
+    cameraId = prompt('cameraId')
+  }
 });
 
-setInterval(positionLoop, 50)
+if(document.getElementById('people')) {
+  setInterval(renderLoop, 100)
+} else {
+  var videoInput = document.getElementById('video');
+  var ctracker = new clm.tracker();
+
+  ctracker.init();
+  ctracker.start(videoInput);
+
+  function gumSuccess( stream ) {
+    if ("srcObject" in videoInput) {
+      videoInput.srcObject = stream;
+    } else {
+      videoInput.src = (window.URL && window.URL.createObjectURL(stream));
+    }
+
+    videoInput.onloadedmetadata = function() {
+      videoInput.play();
+      setTimeout(positionLoop, 100)
+    }
+  }
+
+  function gumFail () {}
+
+  if (navigator.mediaDevices) {
+    navigator.mediaDevices.getUserMedia({video : true}).then(gumSuccess).catch(gumFail);
+  } else if (navigator.getUserMedia) {
+    navigator.getUserMedia({video : true}, gumSuccess, gumFail);
+  } else {
+    alert("Your browser does not seem to support getUserMedia, using a fallback video instead.");
+  }
+
+  setInterval(positionLoop, 100)
+}

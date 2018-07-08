@@ -8,12 +8,11 @@ const io = require('socket.io')(server)
 const staticPath = path.join(__dirname, 'static')
 
 io.on('connection', function (socket) {
-  socket.emit('news', { hello: 'world' });
-  socket.on('my other event', function (data) {
-    console.log(data);
+  socket.on('face', function (data) {
+    socket.broadcast.emit('face', data)
+    //socket.emit('face', data);
   });
 });
-
 
 app.use(express.static(staticPath))
 app.get('/burn', function(req, res) {
