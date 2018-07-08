@@ -33,7 +33,6 @@ function scale(positions) {
 //center point of window
   const cx = window.pJSDom[0].pJS.canvas.w / 2
   const cy = window.pJSDom[0].pJS.canvas.h / 2
-  console.log(cx, cy)
 
   var maxX = positions[0][0];
   var minX = positions[0][0];
@@ -56,7 +55,6 @@ function scale(positions) {
   }
 
 
-  console.log(typeof minX, typeof maxX,minY,maxY)
 //center point of face in video
   const w = (maxX - minX) / 2;
   const h = (maxY - minY) / 2;
@@ -68,17 +66,16 @@ function scale(positions) {
  var _positions = positions.map(item => item.slice());
 
  for(var i = 0; i < positions.length; i++){
-   if(!foobar)
-   console.log('inside loop:', i,  (positions[i][0] - minX) * ratioX, (positions[i][1] - minY) * ratioY)
+   // if(!foobar)
    _positions[i][0] = (positions[i][0] - minX) * ratioX
    _positions[i][1] = (positions[i][1] - minY) * ratioY
  }
- console.log(_positions)
+
  return _positions
 }
 
-foobar = false
-setTimeout(function(){foobar = true}, 10000)
+// foobar = false
+// setTimeout(function(){foobar = true}, 10000)
 
 function repulse(positions, ix) {
   const pJS = pJSDom[0].pJS
@@ -107,19 +104,18 @@ function repulse(positions, ix) {
 }
 
 function demoicFace(pJS, positions) {
-  // pJS.particles.array.splice(1000)
+  pJS.particles.array.splice(pJS.particles.array.length - positions.length, positions.length)
   let _positions = scale(positions)
   for (var p = 0;p < _positions.length;p++) {
-    if(p < 44 || p > 61) {
+    // if(p < 44 || p > 61) {
       let pt = _positions[p];
-      api.pushParticles(1, {pos_x: pt.x, pos_y: pt.y})
-      api.pushParticles(1, {pos_x: 10, pos_y: 10})
-    }
+      api.pushParticles(1, {pos_x: pt[0], pos_y: pt[1]})
+    // }
   }
 
-  for (var p = 44;p < 61;p++) {
-    // repulse(positions, p)
-  }
+  // for (var p = 44;p < 61;p++) {
+  //   repulse(positions, p)
+  // }
 }
 
 function ghost(pJS, positions) {
