@@ -29,24 +29,56 @@ if (navigator.mediaDevices) {
   alert("Your browser does not seem to support getUserMedia, using a fallback video instead.");
 }
 
-function scale(positions, ix, scale) {
-
+function scale(positions) {
+//center point of window
   const cx = window.pJSDom[0].pJS.canvas.w / 2
   const cy = window.pJSDom[0].pJS.canvas.h / 2
+  console.log(cx, cy)
 
-  const w = (positions[13][0] - positions[1][0]) / 2
-  const h = (positions[13][1] - positions[1][1]) / 2
+  var maxX = positions[0][0];
+  var minX = positions[0][0];
+  var maxY = positions[0][1];
+  var minY = positions[0][1];
 
-  const xs = 10//cx / w
-  const xy = 10//cy / h
+  for(var i = 1; i < positions.length; i++){
+    if(positions[i][0] > maxX){
+      maxX = positions[i][0];
+    }
+    if(positions[i][0] < minX){
+      minX = positions[i][0];
+    }
+    if(positions[i][1] > maxY){
+      maxY = positions[i][1];
+    }
+    if(positions[i][1] < minY){
+      minY = positions[i][1];
+    }
+  }
 
-  //console.log(cx,w, 'x', cy,h, '|', xs,xy)
 
-  const x = (((positions[ix][0] - positions[62][0]) * xs) * scale + cx)
-  const y = (((positions[ix][1] - positions[62][1]) * xy) * scale + cy)
+  console.log(typeof minX, typeof maxX,minY,maxY)
+//center point of face in video
+  const w = (maxX - minX) / 2;
+  const h = (maxY - minY) / 2;
 
-  return {x, y}
+//ratios
+ const ratioX = cx / w;
+ const ratioY = cy / h;
+
+ var _positions = positions.map(item => item.slice());
+
+ for(var i = 0; i < positions.length; i++){
+   if(!foobar)
+   console.log('inside loop:', i,  (positions[i][0] - minX) * ratioX, (positions[i][1] - minY) * ratioY)
+   _positions[i][0] = (positions[i][0] - minX) * ratioX
+   _positions[i][1] = (positions[i][1] - minY) * ratioY
+ }
+ console.log(_positions)
+ return _positions
 }
+
+foobar = false
+setTimeout(function(){foobar = true}, 10000)
 
 function repulse(positions, ix) {
   const pJS = pJSDom[0].pJS
@@ -75,23 +107,26 @@ function repulse(positions, ix) {
 }
 
 function demoicFace(pJS, positions) {
-  pJS.particles.array.splice(280)
-  for (var p = 0;p < positions.length;p++) {
+  // pJS.particles.array.splice(1000)
+  let _positions = scale(positions)
+  for (var p = 0;p < _positions.length;p++) {
     if(p < 44 || p > 61) {
-      let pt = scale(positions, p, 2);
+      let pt = _positions[p];
       api.pushParticles(1, {pos_x: pt.x, pos_y: pt.y})
+      api.pushParticles(1, {pos_x: 10, pos_y: 10})
     }
   }
 
   for (var p = 44;p < 61;p++) {
-    repulse(positions, p)
+    // repulse(positions, p)
   }
 }
 
 function ghost(pJS, positions) {
   pJS.particles.array.splice(pJS.particles.array.length - positions.length, positions.length);
+  scale(positions)
   for (var p = 0;p < positions.length;p++) {
-    let pt = scale(positions, p, 2);
+    let pt = positions[p]
     api.pushParticles(1, {pos_x: pt.x, pos_y: pt.y})
   }
 }
