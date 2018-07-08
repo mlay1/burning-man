@@ -31,8 +31,12 @@ if (navigator.mediaDevices) {
 
 function scale(positions) {
 //center point of window
-  const cx = window.pJSDom[0].pJS.canvas.w / 2
-  const cy = window.pJSDom[0].pJS.canvas.h / 2
+  let cx = window.pJSDom[0].pJS.canvas.w / 2
+  let cy = window.pJSDom[0].pJS.canvas.h / 2
+
+  var padding = 120
+  cx -= padding
+  cy -= padding
 
   var maxX = positions[0][0];
   var minX = positions[0][0];
@@ -54,7 +58,6 @@ function scale(positions) {
     }
   }
 
-
 //center point of face in video
   const w = (maxX - minX) / 2;
   const h = (maxY - minY) / 2;
@@ -67,8 +70,8 @@ function scale(positions) {
 
  for(var i = 0; i < positions.length; i++){
    // if(!foobar)
-   _positions[i][0] = (positions[i][0] - minX) * ratioX
-   _positions[i][1] = (positions[i][1] - minY) * ratioY
+   _positions[i][0] = ((positions[i][0] - minX) * ratioX) + (padding)
+   _positions[i][1] = ((positions[i][1] - minY) * ratioY) + (padding)
  }
 
  return _positions
@@ -79,13 +82,13 @@ function scale(positions) {
 
 function repulse(positions, ix) {
   const pJS = pJSDom[0].pJS
-  const fpos = scale(positions, ix, 1);
 
+  const fpos = scale(positions)
   for(let i =0; i< pJS.particles.array.length; i++) {
     const p = pJS.particles.array[i]
 
-    var dx_mouse = p.x - fpos.x,
-      dy_mouse = p.y - fpos.y,
+    var dx_mouse = p.x - fpos[i][0],
+      dy_mouse = p.y - fpos[i][1],
       dist_mouse = Math.sqrt(dx_mouse * dx_mouse + dy_mouse * dy_mouse);
 
     var normVec = {x: dx_mouse / dist_mouse, y: dy_mouse / dist_mouse},
@@ -103,36 +106,78 @@ function repulse(positions, ix) {
   }
 }
 
+var demoicStop = [61,60,65,56,57,58,46,48,43,42]
+var demoicFirst = null
 function demoicFace(pJS, positions) {
-  pJS.particles.array.splice(pJS.particles.array.length - positions.length, positions.length)
+  pJS.particles.array.splice(200 - positions.length, positions.length);
   let _positions = scale(positions)
-  for (var p = 0;p < _positions.length;p++) {
-    // if(p < 44 || p > 61) {
-      let pt = _positions[p];
-      api.pushParticles(1, {pos_x: pt[0], pos_y: pt[1]})
-    // }
+  for (var p = 0; p < _positions.length; p+=2) {
+    if(demoicStop.indexOf(p) !== -1) continue;
+    let pt = _positions[p]
+    api.pushParticles(1, {pos_x: pt[0], pos_y: pt[1]})
+    api.pushParticles(1, {pos_x: pt[0], pos_y: pt[1]})
+    api.pushParticles(1, {pos_x: pt[0], pos_y: pt[1]})
   }
-
-  // for (var p = 44;p < 61;p++) {
-  //   repulse(positions, p)
-  // }
 }
 
 function ghost(pJS, positions) {
   pJS.particles.array.splice(pJS.particles.array.length - positions.length, positions.length);
-  scale(positions)
-  for (var p = 0;p < positions.length;p++) {
-    let pt = positions[p]
-    api.pushParticles(1, {pos_x: pt.x, pos_y: pt.y})
+  let _positions = scale(positions)
+  for (var p = 0;p < _positions.length;p++) {
+    let pt = _positions[p]
+    api.pushParticles(1, {pos_x: pt[0], pos_y: pt[1]})
   }
 }
+
+function faceonly(pJS, positions) {
+  pJS.particles.array.splice(positions.length, pJS.particles.array.length);
+  let _positions = scale(positions)
+  for (var p = 0;p < _positions.length;p++) {
+    let pt = _positions[p]
+    api.pushParticles(1, {pos_x: pt[0], pos_y: pt[1]})
+  }
+}
+
+var eyes = [23, 63,24,64,25,65,26,66,30,69,31,70,28,67,29,68, 54, 52,44,50]
+function happy(pJS, positions) {
+  pJS.particles.array.splice(eyes.length*4, eyes.length);
+  let _positions = scale(positions)
+
+  for (var p in eyes) {
+    let pt = _positions[eyes[p]]
+    api.pushParticles(1, {pos_x: pt[0], pos_y: pt[1]})
+  }
+
+}
+
+var dreaming = null
+
 function positionLoop() {
   var positions = ctracker.getCurrentPosition();
   if (positions) {
     const pJS = pJSDom[0].pJS
-    demoicFace(pJS, positions)
+    //demoicFace(pJS, positions)
     //ghost(pJS, positions)
+    faceonly(pJS, positions)
+    happy(pJS, positions)
+    if(dreaming) {
+      clearTimeout(dreaming);
+      dreaming = null;
+      if(document.getElementById('status'))document.getElementById('status').innerText = 'HI!';
+      if(document.getElementById('people'))document.getElementById('people').style.display='none';
+    }
+  } else {
+    document.getElementById('status').innerText = 'unity with universe';
+    if(!dreaming) dreaming = setTimeout(function() {
+      if(document.getElementById('status')) document.getElementById('status').innerText = 'dreaming of you!';
+      if(document.getElementById('people')) document.getElementById('people').style.display='block';
+    }, 5000)
   }
 }
 
-setInterval(positionLoop, 100)
+var socket = io();
+socket.on('connect', function() {
+  console.log('Connected!');
+});
+
+setInterval(positionLoop, 50)

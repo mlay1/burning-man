@@ -1,31 +1,31 @@
 particlesJS('particles-js', {
   "particles": {
     "number": {
-      "value": 0,
+      "value": 280,
       "density": {
         "enable": false,
-        "value_area": 481.0236182596568
+        "value_area": 5
       }
     },
     "color": {
       "value": "#CCC"
     },
     "size": {
-      "value": 0,
+      "value": 1,
       "random": true,
       "anim": {
         "enable": false,
-        "speed": 5,
+        "speed": .5,
         "size_min": 0.1,
         "sync": true
       }
     },
     "line_linked": {
       "enable": true,
-      "distance": 130.10236182596568,
-      "color": "#ffffff",
-      "opacity": 0.7,
-      "width": 3
+      "distance": 40,
+      "color": "#FFF",
+      "opacity": .3,
+      "width": .2
     },
     "move": {
       "enable": true,
