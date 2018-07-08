@@ -19,9 +19,7 @@ function gumSuccess( stream ) {
   }
 }
 
-function gumFail () {
-
-}
+function gumFail () {}
 
 if (navigator.mediaDevices) {
   navigator.mediaDevices.getUserMedia({video : true}).then(gumSuccess).catch(gumFail);
@@ -64,7 +62,7 @@ function repulse(positions, ix) {
     var normVec = {x: dx_mouse / dist_mouse, y: dy_mouse / dist_mouse},
       repulseRadius = pJS.interactivity.modes.repulse.distance,
       velocity = 100,
-      repulseFactor = clamp((1 / repulseRadius) * (-1 * Math.pow(dist_mouse / repulseRadius, 2) + 1) * repulseRadius * velocity, 0, 50);
+      repulseFactor = clamp((1 / repulseRadius) * (-1 * Math.pow(dist_mouse / repulseRadius, 2) + 1) * repulseRadius * velocity, 0, 5);
 
     var pos = {
       x: p.x + normVec.x * repulseFactor,
@@ -76,15 +74,33 @@ function repulse(positions, ix) {
   }
 }
 
+function demoicFace(pJS, positions) {
+  pJS.particles.array.splice(280)
+  for (var p = 0;p < positions.length;p++) {
+    if(p < 44 || p > 61) {
+      let pt = scale(positions, p, 2);
+      api.pushParticles(1, {pos_x: pt.x, pos_y: pt.y})
+    }
+  }
+
+  for (var p = 44;p < 61;p++) {
+    repulse(positions, p)
+  }
+}
+
+function ghost(pJS, positions) {
+  pJS.particles.array.splice(pJS.particles.array.length - positions.length, positions.length);
+  for (var p = 0;p < positions.length;p++) {
+    let pt = scale(positions, p, 2);
+    api.pushParticles(1, {pos_x: pt.x, pos_y: pt.y})
+  }
+}
 function positionLoop() {
   var positions = ctracker.getCurrentPosition();
   if (positions) {
     const pJS = pJSDom[0].pJS
-    pJS.particles.array.splice(pJS.particles.array.length - positions.length, positions.length);
-    for (var p = 0;p < positions.length;p++) {
-      let pt = scale(positions, p, 2);
-      api.pushParticles(1, {pos_x: pt.x, pos_y: pt.y})
-    }
+    demoicFace(pJS, positions)
+    //ghost(pJS, positions)
   }
 }
 
