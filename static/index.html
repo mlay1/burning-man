@@ -207,69 +207,18 @@
     }
 
     function positionLoop() {
-
-      //requestAnimFrame(positionLoop);
       var positions = ctracker.getCurrentPosition();
-      // do something with the positions ...
-      // print the positions
-      var positionString = "";
-      //console.log(positions)
-
       if (positions) {
-
-
-        for (var p = 0;p < positions.length;p++) {
-          repulse(1, positions, p)
-        }
-
-
-
-        //if(Math.random()*100 < 30) return
-/*
         const pJS = pJSDom[0].pJS
         pJS.particles.array.splice(pJS.particles.array.length - positions.length, positions.length);
         for (var p = 0;p < positions.length;p++) {
           let pt = scale(positions, p, 2);
           api.pushParticles(1, {pos_x: pt.x, pos_y: pt.y})
         }
-        */
-//        api.removeParticles(positions.length)
-
-//        pJS.fn.particlesDraw();
-
-
-        //console.log(positions[p]);
-        //api.pushParticles(1)//, {pos_x: positions[0][0], pos_y: positions[0][1]})
-        //let pt
-        //pt = scale(positions, 62, 1); document.getElementById('mark1').style.top = parseInt(pt.y) + 'px'; document.getElementById('mark1').style.left = parseInt(pt.x) + 'px';
-        //api.pushParticles(1, {pos_x: pt.x, pos_y: pt.y})
-        //pt = scale(positions, 32, 1); document.getElementById('mark2').style.top = parseInt(pt.y) + 'px'; document.getElementById('mark2').style.left = parseInt(pt.x) + 'px';
-        //api.pushParticles(3, {pos_x: pt.x, pos_y: pt.y})
-        //pt = scale(positions, 27, 1); document.getElementById('mark3').style.top = parseInt(pt.y) + 'px'; document.getElementById('mark3').style.left = parseInt(pt.x) + 'px';
-        //api.pushParticles(3, {pos_x: pt.x, pos_y: pt.y})
-        //pt = scale(positions, 53, 1); document.getElementById('mark4').style.top = parseInt(pt.y) + 'px'; document.getElementById('mark4').style.left = parseInt(pt.x) + 'px';
-        //api.pushParticles(3, {pos_x: pt.x, pos_y: pt.y})
-        //pt = scale(positions, 44, 1); document.getElementById('mark5').style.top = parseInt(pt.y) + 'px'; document.getElementById('mark5').style.left = parseInt(pt.x) + 'px';
-        //api.pushParticles(1, {pos_x: pt.x, pos_y: pt.y})
-
-        //pt = scale(positions, 27, 10); document.getElementById('mark4').style.left = parseInt(pt.x) + 'px'
-        //api.pushParticles(1, {pos_x: pt.x, pos_y: pt.y})
-
-        //console.log(scale(positions, 32))
-
-        //console.log(positions[62][0],scale(positions[62][0]),scale(positions[62][1]))
-
-        // api.repulseParticle({radius: 20, x: scale(positions[62][0]), y: scale(positions[62][1])})
-        // api.repulseParticle({radius: 20, x: scale(positions[32][0]), y: scale(positions[32][1])})
-        // api.repulseParticle({radius: 20, x: scale(positions[27][0]), y: scale(positions[27][1])})
       }
     }
 
     setInterval(positionLoop, 100)
-
-    //setInterval(() => api.removeParticles(40 * (1500/200)), 1500)
-    //setInterval(() => api.removeParticles(380), 3000)
-    //positionLoop();
   </script>
 </div>
 </body>
