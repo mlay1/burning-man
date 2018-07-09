@@ -121,17 +121,16 @@ function happy(pJS, positions) {
 }
 
 var dreaming = null
-var emotion = ''
+var emotion = 'happy'
 var positions
-
 
 function renderLoop() {
   if (positions) {
     const pJS = pJSDom[0].pJS
-    //demoicFace(pJS, positions)
-    //ghost(pJS, positions)
-    //faceonly(pJS, positions)
-    happy(pJS, positions)
+    if(emotion == 'sad') demoicFace(pJS, positions)
+    else if(emotion == 'ghost') ghost(pJS, positions)
+    else if(emotion == 'faceonly') faceonly(pJS, positions)
+    else if(emotion == 'happy') happy(pJS, positions)
     if(dreaming) {
       clearTimeout(dreaming);
       dreaming = null;
@@ -172,13 +171,22 @@ function positionLoop() {
 
 let cameraId = '';
 
+var allPeople = []
+var activeCId = null
 var socket = io();
 socket.on('connect', function() {
   console.log('Connected!');
   if(document.getElementById('people')) {
     socket.on('face', function (msg) {
-      console.log('message', msg)
-      positions = msg.data
+      if(!activeCId) activeCId = msg.cameraId
+      if(allPeople.indexOf(msg.cameraId) == -1) {
+        allPeople.push(msg.cameraId);
+      }
+      console.log('rec', msg.cameraId, msg)
+      if(msg.cameraId == activeCId) {
+        positions = msg.data
+        emotion = msg.emotion
+      }
     })
   } else {
     cameraId = prompt('cameraId')
